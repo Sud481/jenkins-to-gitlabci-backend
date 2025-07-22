@@ -7,7 +7,7 @@ CORS(app, resources={r"/convert": {"origins": "*"}})  # Allow all origins (or sp
 @app.route("/convert", methods=["POST", "OPTIONS"])
 def convert():
     if request.method == "OPTIONS":
-        return '', 200  # Respond OK to preflight
+        return '', 204  # Respond OK to preflight
     data = request.get_json()
     jenkinsfile = data.get("jenkinsFile", "")
 
@@ -27,7 +27,7 @@ def convert():
         }
     }
 
-    return jsonify(output)
+    return yaml.dump(output)
 
 if __name__ == "__main__":
     import os

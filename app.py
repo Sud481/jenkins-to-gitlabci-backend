@@ -1,18 +1,16 @@
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import yaml
-import os
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/convert": {"origins": "*"}})  # Allow all origins (or specify GitHub pages URL)
 
-@app.route('/convert', methods=['POST'])
+@app.route("/convert", methods=["POST", "OPTIONS"])
 def convert():
+    if request.method == "OPTIONS":
+        return '', 200  # Respond OK to preflight
     data = request.get_json()
-    jenkinsfile = data.get("jenkinsfile", "")
+    jenkinsfile = data.get("jenkinsFile", "")
 
-    # Simple mock conversion logic
     output = {
         "stages": ["build", "test", "deploy"],
         "build_job": {
@@ -29,8 +27,9 @@ def convert():
         }
     }
 
-    return yaml.dump(output)
+    return jsonify(output)
 
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 10000))  # fallback to 10000
+if __name__ == "__main__":
+    import os
+    port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
